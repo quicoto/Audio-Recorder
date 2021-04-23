@@ -1,4 +1,3 @@
-
 const gulp = require('gulp');
 const del = require('del');
 const sass = require('gulp-sass');
@@ -13,10 +12,12 @@ const paths = {
   dist: './dist/'
 };
 
+paths.assets = `${paths.src}assets/`;
 paths.styles = `${paths.src}styles/`;
 paths.stylesMain = `${paths.styles}main.scss`;
 paths.js = `${paths.src}js/`;
 paths.jsIndex = `${paths.js}index.js`;
+paths.distAssets = `${paths.dist}assets/`;
 paths.distCSS = `${paths.dist}css/`;
 paths.distJS = `${paths.dist}js/`;
 paths.html = `${paths.src}index.html`;
@@ -30,6 +31,8 @@ if (process.env.NODE_ENV === 'production') {
   sassOptions.outputStyle = 'compressed';
   webpackMode = 'production';
 }
+
+gulp.task('assets', () => gulp.src([`${paths.assets}**`]).pipe(gulp.dest(paths.distAssets)));
 
 gulp.task('clean', () => del([
   'dist'

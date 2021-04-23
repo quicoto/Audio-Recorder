@@ -1,11 +1,11 @@
-// set up basic variables for app
-
-const record = document.querySelector('.record');
-const stop = document.querySelector('.stop');
-const download = document.querySelector('.download');
-const soundClips = document.querySelector('.sound-clips');
-const canvas = document.querySelector('.visualizer');
-const mainSection = document.querySelector('.main-controls');
+const $ = {
+  canvas: document.querySelector('.visualizer'),
+  download: document.querySelector('.button__download'),
+  mainSection: document.querySelector('.main-controls'),
+  record: document.querySelector('.button__record'),
+  soundClips: document.querySelector('.soundClips'),
+  stop: document.querySelector('.button__stop')
+};
 
 // disable stop button while not recording
 
@@ -14,118 +14,97 @@ stop.disabled = true;
 // visualiser setup - create web audio api context and canvas
 
 let audioCtx;
-const canvasCtx = canvas.getContext("2d");
+const canvasCtx = $.canvas.getContext('2d');
 
-//main block for doing the audio recording
+// main block for doing the audio recording
 
 if (navigator.mediaDevices.getUserMedia) {
-  console.log('getUserMedia supported.');
-
   const constraints = { audio: true };
   let chunks = [];
 
-  let onSuccess = function(stream) {
+  const onSuccess = function (stream) {
     const mediaRecorder = new MediaRecorder(stream);
 
+    // eslint-disable-next-line no-use-before-define
     visualize(stream);
 
-    record.onclick = function() {
+    $.record.onclick = function () {
       mediaRecorder.start();
-      console.log(mediaRecorder.state);
-      console.log("recorder started");
-      record.style.background = "red";
 
-      stop.disabled = false;
-      record.disabled = true;
-    }
+      $.stop.removeAttribute('hidden');
+      $.record.setAttribute('hidden', 'true');
+    };
 
-    stop.onclick = function() {
+    $.stop.onclick = function () {
       mediaRecorder.stop();
-      console.log(mediaRecorder.state);
-      console.log("recorder stopped");
-      record.style.background = "";
-      record.style.color = "";
-      // mediaRecorder.requestData();
 
-      stop.disabled = true;
-      record.disabled = false;
-    }
+      $.record.removeAttribute('hidden');
+      $.stop.setAttribute('hidden', 'true');
+    };
 
-    mediaRecorder.onstop = function(e) {
-      console.log("data available after MediaRecorder.stop() called.");
+    mediaRecorder.onstop = function () {
+      const date = new Date();
+      const minutes = date.getMinutes() < 10 ? `0${date.getMinutes()}` : date.getMinutes();
+      const defaultName = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()} ${date.getHours()}:${minutes}`;
 
-      const clipName = prompt('Enter a name for your sound clip?','My unnamed clip');
+      // eslint-disable-next-line no-alert
+      const clipName = prompt('Enter a name for your sound clip', defaultName);
 
-      const clipContainer = document.createElement('article');
-      const clipLabel = document.createElement('p');
-      const audio = document.createElement('audio');
-      const deleteButton = document.createElement('button');
+      const $clipContainer = document.createElement('article');
+      const $clipLabel = document.createElement('h4');
+      const $audio = document.createElement('audio');
+      const $downloadLink = document.createElement('a');
 
-      clipContainer.classList.add('clip');
-      audio.setAttribute('controls', '');
-      deleteButton.textContent = 'Delete';
-      deleteButton.className = 'delete';
+      $clipLabel.classList.add('recordingHeading');
+      $downloadLink.innerText = 'Download this recording';
 
-      if(clipName === null) {
-        clipLabel.textContent = 'My unnamed clip';
+      $clipContainer.classList.add('clip');
+      $audio.setAttribute('controls', '');
+
+      const $labelImage = '<img src="./assets/icons/music.svg">';
+
+      $clipLabel.innerHTML = $labelImage;
+
+      if (clipName === null) {
+        $clipLabel.innerHTML += 'My unnamed clip';
       } else {
-        clipLabel.textContent = clipName;
+        $clipLabel.innerHTML += clipName;
       }
 
-      clipContainer.appendChild(audio);
-      clipContainer.appendChild(clipLabel);
-      clipContainer.appendChild(deleteButton);
-      soundClips.appendChild(clipContainer);
+      $clipContainer.appendChild($clipLabel);
+      $clipContainer.appendChild($audio);
+      $clipContainer.appendChild($downloadLink);
+      $.soundClips.appendChild($clipContainer);
+      $.soundClips.removeAttribute('hidden');
 
-      audio.controls = true;
-      const blob = new Blob(chunks, { 'type' : 'audio/ogg; codecs=opus' });
+      $audio.controls = true;
+      const blob = new Blob(chunks, { type: 'audio/ogg; codecs=opus' });
       chunks = [];
       const audioURL = window.URL.createObjectURL(blob);
-      audio.src = audioURL;
-      console.log("recorder stopped");
+      $audio.src = audioURL;
 
-      download.onclick = function () {
-        var a = document.createElement("a");
-        document.body.appendChild(a);
-        a.style = "display: none";
-        a.href = audioURL;
-        a.download = "test.ogg";
-        a.click();
-      }
+      $downloadLink.href = audioURL;
+      $downloadLink.download = `${clipName}.ogg`;
+    };
 
-      deleteButton.onclick = function(e) {
-        let evtTgt = e.target;
-        evtTgt.parentNode.parentNode.removeChild(evtTgt.parentNode);
-      }
-
-      clipLabel.onclick = function() {
-        const existingName = clipLabel.textContent;
-        const newClipName = prompt('Enter a new name for your sound clip?');
-        if(newClipName === null) {
-          clipLabel.textContent = existingName;
-        } else {
-          clipLabel.textContent = newClipName;
-        }
-      }
-    }
-
-    mediaRecorder.ondataavailable = function(e) {
+    mediaRecorder.ondataavailable = function (e) {
       chunks.push(e.data);
-    }
-  }
+    };
+  };
 
-  let onError = function(err) {
-    console.log('The following error occured: ' + err);
-  }
+  const onError = function (err) {
+    // eslint-disable-next-line no-console
+    console.log(`The following error occured: ${err}`);
+  };
 
   navigator.mediaDevices.getUserMedia(constraints).then(onSuccess, onError);
-
 } else {
-   console.log('getUserMedia not supported on your browser!');
+  // eslint-disable-next-line no-console
+  console.log('getUserMedia not supported on your browser!');
 }
 
 function visualize(stream) {
-  if(!audioCtx) {
+  if (!audioCtx) {
     audioCtx = new AudioContext();
   }
 
@@ -137,19 +116,19 @@ function visualize(stream) {
   const dataArray = new Uint8Array(bufferLength);
 
   source.connect(analyser);
-  //analyser.connect(audioCtx.destination);
 
-  draw()
+  // eslint-disable-next-line no-use-before-define
+  draw();
 
   function draw() {
-    const WIDTH = canvas.width
-    const HEIGHT = canvas.height;
+    const WIDTH = $.canvas.width;
+    const HEIGHT = $.canvas.height;
 
     requestAnimationFrame(draw);
 
     analyser.getByteTimeDomainData(dataArray);
 
-    canvasCtx.fillStyle = 'rgb(200, 200, 200)';
+    canvasCtx.fillStyle = 'rgb(255, 255, 255)';
     canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
 
     canvasCtx.lineWidth = 2;
@@ -157,16 +136,14 @@ function visualize(stream) {
 
     canvasCtx.beginPath();
 
-    let sliceWidth = WIDTH * 1.0 / bufferLength;
+    const sliceWidth = (WIDTH * 1.0) / bufferLength;
     let x = 0;
 
+    for (let i = 0; i < bufferLength; i += 1) {
+      const v = dataArray[i] / 128.0;
+      const y = (v * HEIGHT) / 2;
 
-    for(let i = 0; i < bufferLength; i++) {
-
-      let v = dataArray[i] / 128.0;
-      let y = v * HEIGHT/2;
-
-      if(i === 0) {
+      if (i === 0) {
         canvasCtx.moveTo(x, y);
       } else {
         canvasCtx.lineTo(x, y);
@@ -175,14 +152,7 @@ function visualize(stream) {
       x += sliceWidth;
     }
 
-    canvasCtx.lineTo(canvas.width, canvas.height/2);
+    canvasCtx.lineTo($.canvas.width, $.canvas.height / 2);
     canvasCtx.stroke();
-
   }
 }
-
-window.onresize = function() {
-  canvas.width = mainSection.offsetWidth;
-}
-
-window.onresize();

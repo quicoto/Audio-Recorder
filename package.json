@@ -1,9 +1,10 @@
 {
   "name": "audio-recorder",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Web App for recording and then downloading audio files in OGG format.",
   "scripts": {
     "build": "NODE_ENV=production npm-run-all clean --parallel build:*",
+    "build:assets": "gulp assets",
     "build:css": "gulp css",
     "build:js": "gulp js",
     "build:html": "gulp html",
