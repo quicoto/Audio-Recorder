@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1
+
+- Spacing between recordings
+
 ## 1.1.0
 
 - New UI
