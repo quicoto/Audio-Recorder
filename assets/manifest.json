@@ -1,12 +1,12 @@
 {
   "name": "Audio Recorder",
   "short_name": "Recorder",
-  "start_url": "index.html",
+  "start_url": "../index.html",
   "description": "Webapp to record audio",
   "display": "standalone",
   "orientation": "portrait",
-  "theme_color": "#3498db",
-  "background_color": "#3498db",
+  "theme_color": "#FFF",
+  "background_color": "#FFF",
   "icons": [
     {
         "src": "android-chrome-192x192.png",
