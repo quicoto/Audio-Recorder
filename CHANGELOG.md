@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.2
+
+- Small tweaks, remove unused code
+
 ## 1.1.1
 
 - Spacing between recordings

@@ -7,16 +7,8 @@ const $ = {
   stop: document.querySelector('.button__stop')
 };
 
-// disable stop button while not recording
-
-stop.disabled = true;
-
-// visualiser setup - create web audio api context and canvas
-
 let audioCtx;
 const canvasCtx = $.canvas.getContext('2d');
-
-// main block for doing the audio recording
 
 if (navigator.mediaDevices.getUserMedia) {
   const constraints = { audio: true };
@@ -56,7 +48,7 @@ if (navigator.mediaDevices.getUserMedia) {
       const $downloadLink = document.createElement('a');
 
       $clipLabel.classList.add('recordingHeading');
-      $downloadLink.innerText = 'Download this recording';
+      $downloadLink.innerText = 'Download recording';
 
       $clipContainer.classList.add('clip');
       $audio.setAttribute('controls', '');
@@ -98,9 +90,6 @@ if (navigator.mediaDevices.getUserMedia) {
   };
 
   navigator.mediaDevices.getUserMedia(constraints).then(onSuccess, onError);
-} else {
-  // eslint-disable-next-line no-console
-  console.log('getUserMedia not supported on your browser!');
 }
 
 function visualize(stream) {
@@ -132,7 +121,7 @@ function visualize(stream) {
     canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
 
     canvasCtx.lineWidth = 2;
-    canvasCtx.strokeStyle = 'rgb(0, 0, 0)';
+    canvasCtx.strokeStyle = '#08c';
 
     canvasCtx.beginPath();
 

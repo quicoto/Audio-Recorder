@@ -5,8 +5,8 @@
   "description": "Webapp to record audio",
   "display": "standalone",
   "orientation": "portrait",
-  "theme_color": "#FFF",
-  "background_color": "#FFF",
+  "theme_color": "#08c",
+  "background_color": "#08c",
   "icons": [
     {
         "src": "android-chrome-192x192.png",
